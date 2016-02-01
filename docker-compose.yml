@@ -1,0 +1,7 @@
+tests:
+  build: .
+  command: py.test -v
+  volumes:
+    - ./usr/src/app
+  environment:
+    - PYTHONPATH=.
