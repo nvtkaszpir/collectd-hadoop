@@ -7,12 +7,25 @@ may mock these calls to capture input and outputs from them.
 '''
 
 
+class Value(object):
+
+    def __setattr__(self, name, value):
+        pass
+
+    def dispatch(self):
+        pass
+
+
 def warning(*args, **kwargs):
-    pass
+    print('warning', args)
 
 
 def error(*args, **kwargs):
-    pass
+    print('error', args)
+
+
+def info(*args, **kwargs):
+    print('info', args)
 
 
 def register_config(*args, **kwargs):
@@ -21,3 +34,7 @@ def register_config(*args, **kwargs):
 
 def register_read(*args, **kwargs):
     pass
+
+
+def Values(*args, **kwargs):
+    return Value()

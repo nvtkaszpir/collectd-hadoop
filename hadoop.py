@@ -4,12 +4,21 @@ import collectd
 import json
 import urllib2
 
-PREFIX = "hadoop"
 VERBOSE_LOGGING = False
 
 INSTANCE_TYPE_NAMENODE = 'namenode'
 
 CONFIGS = []
+
+
+BEANS = {
+    INSTANCE_TYPE_NAMENODE: [
+        'Hadoop:service=NameNode,name=FSNamesystemState',
+        'java.lang:type=OperatingSystem',
+        'java.lang:type=Threading',
+        'Hadoop:service=NameNode,name=JvmMetrics',
+    ],
+}
 
 
 def configure_callback(conf):
@@ -49,46 +58,52 @@ def configure_callback(conf):
         log_verbose('Configured hadoop instance_type=%s with host=%s' % (instance_type, host), verbose_logging)
 
 
+def process_metrics(host, port, instance, instance_type, verbose_logging):
+    jmx_url = "http://{}:{}/jmx".format(host, port)
+
+    try:
+        beans = json.load(urllib2.urlopen(jmx_url, timeout=10))['beans']
+
+        for bean in beans:
+            if bean['name'] in BEANS[instance_type]:
+                name = bean['modelerType'].split('.')[-1]
+                for key, value in bean.iteritems():
+                    if isinstance(value, int):
+                        dispatch_stat('gauge', '.'.join((name, key)), value, instance, instance_type, verbose_logging)
+
+    except urllib2.URLError as e:
+        collectd.error('hadoop plugin: Error connecting to %s - %r' % (jmx_url, e))
+
+
 def read_callback():
     """Parse stats response from Hadoop services"""
 
-    config = CONFIG
-
-    log_verbose('Read callback called for instance: %s' % config['instance'], config['verbose_logging'])
-    try:
-        metrics = json.load(urllib2.urlopen(config['metrics_url'], timeout=10))
-
-        for group in ['gauges', 'histograms', 'meters', 'timers', 'counters']:
-            for name, values in metrics.get(group, {}).items():
-                for metric, value in values.items():
-                    if not isinstance(value, basestring):
-                        dispatch_stat('gauge', '.'.join((name, metric)), value, config['instance'], config['verbose_logging'])
-    except urllib2.URLError as e:
-        collectd.error('hadoop plugin: Error connecting to %s - %r' % (config['metrics_url'], e))
+    for config in CONFIGS:
+        log_verbose('Read callback called for instance: %s' % config['instance'], config['verbose_logging'])
+        process_metrics(config['host'], config['port'], config['instance'], config['instance_type'], config['verbose_logging'])
 
 
-# def dispatch_stat(type, name, value, instance, verbose_logging):
-#     """Read a key from info response data and dispatch a value"""
-#     if value is None:
-#         collectd.warning('hadoop plugin: Value not found for %s' % name)
-#         return
+def dispatch_stat(type, name, value, instance, instance_type, verbose_logging):
+    """Read a key from info response data and dispatch a value"""
 
-#     log_verbose('Sending value[%s]: %s=%s' % (type, name, value), verbose_logging)
+    if value is None:
+        collectd.warning('hadoop plugin: Value not found for %s' % name)
+    else:
+        log_verbose('Sending value[%s]: %s=%s' % (type, name, value), verbose_logging)
 
-#     val = collectd.Values(plugin='hadoop')
-#     val.type = type
-#     val.type_instance = name
-#     val.values = [value]
-#     # https://github.com/collectd/collectd/issues/716
-#     val.plugin_instance = instance
-#     val.meta = {'0': True}
-#     val.dispatch()
+        val = collectd.Values(plugin='hadoop')
+        val.type = type
+        val.type_instance = name
+        val.values = [value]
+        val.plugin_instance = '.'.join((instance, instance_type))
+        # https://github.com/collectd/collectd/issues/716
+        val.meta = {'0': True}
+        val.dispatch()
 
 
 def log_verbose(msg, verbose_logging):
-    if not verbose_logging:
-        return
-    collectd.info('hadoop plugin [verbose]: %s' % msg)
+    if verbose_logging:
+        collectd.info('hadoop plugin [verbose]: %s' % msg)
 
 
 collectd.register_config(configure_callback)

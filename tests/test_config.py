@@ -22,8 +22,8 @@ def test_set_namenode():
 
     module_string = '''
 HDFSNamenodeHost "example.com"
-Port 9999
-Instance myinstance
+Port "9999"
+Instance "myinstance"
 '''
 
     conf = MockConfig(module_string)
