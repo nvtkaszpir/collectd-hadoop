@@ -4,8 +4,8 @@ A [collectd](http://collectd.org) plugin for [Hadoop](https://hadoop.apache.org/
 
 It collects data from the `/jmx` endpoints for:
 
-* [ ] HDFS NameNodes
-* [ ] HDFS DataNodes
+* [x] HDFS NameNodes
+* [x] HDFS DataNodes
 * [ ] HDFS JournalNodes
 * [ ] HDFS Namenode ZKFCs
 

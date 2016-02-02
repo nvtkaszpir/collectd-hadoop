@@ -17,15 +17,7 @@ def test_default_error(mocker):
     collectd.error.assert_called_once_with('hadoop plugin: Error Host, Port, Instance must be set.')
 
 
-def test_set_namenode():
-    global CONFIGS
-
-    module_string = '''
-HDFSNamenodeHost "example.com"
-Port "9999"
-Instance "myinstance"
-'''
-
+def assert_config(module_string, host, port, instance, instance_type):
     conf = MockConfig(module_string)
 
     configure_callback(conf)
@@ -35,13 +27,41 @@ Instance "myinstance"
     config = CONFIGS[0]
 
     assert 'instance' in config
-    assert config['instance'] == 'myinstance'
+    assert config['instance'] == instance
 
     assert 'host' in config
-    assert config['host'] == 'example.com'
+    assert config['host'] == host
 
     assert 'port' in config
-    assert config['port'] == '9999'
+    assert config['port'] == port
 
     assert 'instance_type' in config
-    assert config['instance_type'] == 'namenode'
+    assert config['instance_type'] == instance_type
+
+
+def test_set_namenode():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HDFSNamenodeHost "example.com"
+Port "9999"
+Instance "myinstance"
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'namenode')
+
+
+def test_set_datanode():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HDFSDatanodeHost "example.com"
+Port "9999"
+Instance "myinstance"
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'datanode')

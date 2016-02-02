@@ -7,13 +7,20 @@ import urllib2
 VERBOSE_LOGGING = False
 
 INSTANCE_TYPE_NAMENODE = 'namenode'
+INSTANCE_TYPE_DATANODE = 'datanode'
 
 CONFIGS = []
 
 
-BEANS = {
+BEAN_PREFIXES = {
     INSTANCE_TYPE_NAMENODE: [
         'Hadoop:service=NameNode,name=FSNamesystemState',
+        'java.lang:type=OperatingSystem',
+        'java.lang:type=Threading',
+        'Hadoop:service=NameNode,name=JvmMetrics',
+    ],
+    INSTANCE_TYPE_DATANODE: [
+        'Hadoop:service=DataNode,name=DataNodeActivity',
         'java.lang:type=OperatingSystem',
         'java.lang:type=Threading',
         'Hadoop:service=NameNode,name=JvmMetrics',
@@ -33,6 +40,9 @@ def configure_callback(conf):
         if node.key == 'HDFSNamenodeHost':
             host = node.values[0]
             instance_type = INSTANCE_TYPE_NAMENODE
+        elif node.key == 'HDFSDatanodeHost':
+            host = node.values[0]
+            instance_type = INSTANCE_TYPE_DATANODE
         elif node.key == 'Port':
             port = node.values[0]
         elif node.key == 'Instance':
@@ -74,12 +84,14 @@ def get_jmx_beans(host, port):
 def process_metrics(host, port, instance, instance_type, verbose_logging):
     beans = get_jmx_beans(host, port)
 
+    print host, instance, instance_type
     for bean in beans:
-        if bean['name'] in BEANS[instance_type]:
-            name = bean['modelerType'].split('.')[-1]
-            for metric, value in bean.iteritems():
-                if isinstance(value, int):
-                    dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
+        for prefix in BEAN_PREFIXES[instance_type]:
+            if bean['name'].startswith(prefix):
+                name = bean['modelerType'].split('.')[-1]
+                for metric, value in bean.iteritems():
+                    if isinstance(value, int):
+                        dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
 
 
 def read_callback():
