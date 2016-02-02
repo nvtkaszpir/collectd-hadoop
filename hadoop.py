@@ -75,7 +75,6 @@ def process_metrics(host, port, instance, instance_type, verbose_logging):
     beans = get_jmx_beans(host, port)
 
     for bean in beans:
-        print bean
         if bean['name'] in BEANS[instance_type]:
             name = bean['modelerType'].split('.')[-1]
             for metric, value in bean.iteritems():
@@ -97,13 +96,14 @@ def dispatch_stat(type, name, value, instance, instance_type, verbose_logging):
     if value is None:
         collectd.warning('hadoop plugin: Value not found for %s' % name)
     else:
-        log_verbose('Sending value[%s]: %s=%s' % (type, name, value), verbose_logging)
+        plugin_instance = '.'.join((instance, instance_type))
+        log_verbose('Sending value from %s [%s]: %s=%s' % (plugin_instance, type, name, value), verbose_logging)
 
         val = collectd.Values(plugin='hadoop')
         val.type = type
         val.type_instance = name
         val.values = [value]
-        val.plugin_instance = '.'.join((instance, instance_type))
+        val.plugin_instance = plugin_instance
         # https://github.com/collectd/collectd/issues/716
         val.meta = {'0': True}
         val.dispatch()

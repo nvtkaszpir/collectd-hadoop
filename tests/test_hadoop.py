@@ -40,5 +40,3 @@ def test_dispatch_stat_no_value(mocker):
 
     collectd.Values.assert_not_called()
     collectd.warning.assert_called_once_with('hadoop plugin: Value not found for doesntmatter')
-
-
