@@ -58,21 +58,29 @@ def configure_callback(conf):
         log_verbose('Configured hadoop instance_type=%s with host=%s' % (instance_type, host), verbose_logging)
 
 
-def process_metrics(host, port, instance, instance_type, verbose_logging):
+def get_jmx_beans(host, port):
     jmx_url = "http://{}:{}/jmx".format(host, port)
 
     try:
         beans = json.load(urllib2.urlopen(jmx_url, timeout=10))['beans']
-
-        for bean in beans:
-            if bean['name'] in BEANS[instance_type]:
-                name = bean['modelerType'].split('.')[-1]
-                for key, value in bean.iteritems():
-                    if isinstance(value, int):
-                        dispatch_stat('gauge', '.'.join((name, key)), value, instance, instance_type, verbose_logging)
+        return beans
 
     except urllib2.URLError as e:
         collectd.error('hadoop plugin: Error connecting to %s - %r' % (jmx_url, e))
+
+    return {}
+
+
+def process_metrics(host, port, instance, instance_type, verbose_logging):
+    beans = get_jmx_beans(host, port)
+
+    for bean in beans:
+        print bean
+        if bean['name'] in BEANS[instance_type]:
+            name = bean['modelerType'].split('.')[-1]
+            for metric, value in bean.iteritems():
+                if isinstance(value, int):
+                    dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
 
 
 def read_callback():
