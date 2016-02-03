@@ -8,6 +8,7 @@ VERBOSE_LOGGING = False
 
 INSTANCE_TYPE_NAMENODE = 'namenode'
 INSTANCE_TYPE_DATANODE = 'datanode'
+INSTANCE_TYPE_HBASE_MASTER = 'hbase_master'
 
 CONFIGS = []
 
@@ -25,8 +26,15 @@ BEAN_PREFIXES = {
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
     },
+    INSTANCE_TYPE_HBASE_MASTER: {
+        'MasterBalancer': 'Hadoop:service=HBase,name=Master,sub=Balancer',
+        'MasterAssignmentManager': 'Hadoop:service=HBase,name=Master,sub=AssignmentManger',
+        'Threading': 'java.lang:type=Threading',
+        'OperatingSystem': 'java.lang:type=OperatingSystem',
+        'MasterServer': 'Hadoop:service=HBase,name=Master,sub=Server',
+        'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
+    },
 }
-
 
 def configure_callback(conf):
     """Received configuration information"""
@@ -43,6 +51,9 @@ def configure_callback(conf):
         elif node.key == 'HDFSDatanodeHost':
             host = node.values[0]
             instance_type = INSTANCE_TYPE_DATANODE
+        elif node.key == 'HbaseMasterHost':
+            host = node.values[0]
+            instance_type = INSTANCE_TYPE_HBASE_MASTER
         elif node.key == 'Port':
             port = node.values[0]
         elif node.key == 'Instance':

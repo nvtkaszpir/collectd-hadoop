@@ -2,14 +2,14 @@
 
 A [collectd](http://collectd.org) plugin for [Hadoop](https://hadoop.apache.org/)
 
-It collects data from the `/jmx` endpoints for:
+It collects data from the http `/jmx` endpoints for:
 
 * [x] HDFS NameNodes
 * [x] HDFS DataNodes
 * [ ] HDFS JournalNodes
 * [ ] HDFS Namenode ZKFCs
 
-* [ ] Hbase Masters
+* [x] Hbase Masters
 * [ ] Hbase Regionservers
 
 These are currently all we use, so if you would like to monitor other pieces, pull requests
