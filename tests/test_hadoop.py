@@ -14,17 +14,17 @@ def test_process_metrics_happy_path(mocker):
 
     process_metrics('example.com', 9999, 'myinstance', 'namenode', True)
 
-    hadoop.dispatch_stat.assert_called_once_with('gauge', '.'.join(('TestModeler', 'mymetric')), 99, 'myinstance', 'namenode', True)
+    hadoop.dispatch_stat.assert_called_once_with('gauge', '.'.join(('Threading', 'mymetric')), 99, 'myinstance', 'namenode', True)
 
 
 def test_dispatch_stat_happy_path(mocker):
     value_mock = mock.Mock()
     mocker.patch('collectd.Values', return_value=value_mock)
 
-    dispatch_stat('gauge', 'TestModeler.mymetric', 99, 'myinstance', 'namenode', True)
+    dispatch_stat('gauge', 'Threading.mymetric', 99, 'myinstance', 'namenode', True)
 
     assert value_mock.type == 'gauge'
-    assert value_mock.type_instance == 'TestModeler.mymetric'
+    assert value_mock.type_instance == 'Threading.mymetric'
     assert value_mock.values == [99]
     assert value_mock.plugin_instance == 'myinstance.namenode'
     assert value_mock.meta == {'0': True}

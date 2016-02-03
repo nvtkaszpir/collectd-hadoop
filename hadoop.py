@@ -13,18 +13,18 @@ CONFIGS = []
 
 
 BEAN_PREFIXES = {
-    INSTANCE_TYPE_NAMENODE: [
-        'Hadoop:service=NameNode,name=FSNamesystemState',
-        'java.lang:type=OperatingSystem',
-        'java.lang:type=Threading',
-        'Hadoop:service=NameNode,name=JvmMetrics',
-    ],
-    INSTANCE_TYPE_DATANODE: [
-        'Hadoop:service=DataNode,name=DataNodeActivity',
-        'java.lang:type=OperatingSystem',
-        'java.lang:type=Threading',
-        'Hadoop:service=NameNode,name=JvmMetrics',
-    ],
+    INSTANCE_TYPE_NAMENODE: {
+        'FSNamesystem': 'Hadoop:service=NameNode,name=FSNamesystemState',
+        'OperatingSystem': 'java.lang:type=OperatingSystem',
+        'Threading': 'java.lang:type=Threading',
+        'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
+    },
+    INSTANCE_TYPE_DATANODE: {
+        'DatanodeActivity': 'Hadoop:service=DataNode,name=DataNodeActivity',
+        'OperatingSystem': 'java.lang:type=OperatingSystem',
+        'Threading': 'java.lang:type=Threading',
+        'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
+    },
 }
 
 
@@ -86,9 +86,8 @@ def process_metrics(host, port, instance, instance_type, verbose_logging):
 
     print host, instance, instance_type
     for bean in beans:
-        for prefix in BEAN_PREFIXES[instance_type]:
+        for name, prefix in BEAN_PREFIXES[instance_type].iteritems():
             if bean['name'].startswith(prefix):
-                name = bean['modelerType'].split('.')[-1]
                 for metric, value in bean.iteritems():
                     if isinstance(value, int):
                         dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
