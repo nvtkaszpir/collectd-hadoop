@@ -14,7 +14,7 @@ def test_default_error(mocker):
     configure_callback(conf)
 
     assert len(CONFIGS) == 0
-    collectd.error.assert_called_once_with('hadoop plugin: Error Host, Port, Instance must be set.')
+    collectd.error.assert_called_once_with('hadoop plugin error: *Host, Port, and Instance must be set.')
 
 
 def assert_config(module_string, host, port, instance, instance_type):
@@ -79,3 +79,17 @@ Instance "myinstance"
 '''
 
     assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_master')
+
+
+def test_set_hbase_regionserver():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HbaseRegionserverHost "example.com"
+Port "9999"
+Instance "myinstance"
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_regionserver')

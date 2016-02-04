@@ -9,6 +9,7 @@ VERBOSE_LOGGING = False
 INSTANCE_TYPE_NAMENODE = 'namenode'
 INSTANCE_TYPE_DATANODE = 'datanode'
 INSTANCE_TYPE_HBASE_MASTER = 'hbase_master'
+INSTANCE_TYPE_HBASE_REGIONSERVER = 'hbase_regionserver'
 
 CONFIGS = []
 
@@ -34,7 +35,17 @@ BEAN_PREFIXES = {
         'MasterServer': 'Hadoop:service=HBase,name=Master,sub=Server',
         'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
     },
+    INSTANCE_TYPE_HBASE_REGIONSERVER: {
+        'Regions': 'Hadoop:service=HBase,name=RegionServer,sub=Regions',
+        'Replication': 'Hadoop:service=HBase,name=RegionServer,sub=Replication',
+        'WAL': 'Hadoop:service=HBase,name=RegionServer,sub=WAL',
+        'Server': 'Hadoop:service=HBase,name=RegionServer,sub=Server',
+        'Threading': 'java.lang:type=Threading',
+        'OperatingSystem': 'java.lang:type=OperatingSystem',
+        'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
+    },
 }
+
 
 def configure_callback(conf):
     """Received configuration information"""
@@ -54,6 +65,9 @@ def configure_callback(conf):
         elif node.key == 'HbaseMasterHost':
             host = node.values[0]
             instance_type = INSTANCE_TYPE_HBASE_MASTER
+        elif node.key == 'HbaseRegionserverHost':
+            host = node.values[0]
+            instance_type = INSTANCE_TYPE_HBASE_REGIONSERVER
         elif node.key == 'Port':
             port = node.values[0]
         elif node.key == 'Instance':
