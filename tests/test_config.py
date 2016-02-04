@@ -67,6 +67,20 @@ Instance "myinstance"
     assert_config(module_string, 'example.com', '9999', 'myinstance', 'datanode')
 
 
+def test_set_hdfs_journalnode():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HDFSJournalnodeHost "example.com"
+Port "9999"
+Instance "myinstance"
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'hdfs_journalnode')
+
+
 def test_set_hbase_master():
     global CONFIGS
     # clear because it is global...

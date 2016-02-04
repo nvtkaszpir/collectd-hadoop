@@ -6,7 +6,7 @@ It collects data from the http `/jmx` endpoints for:
 
 * [x] HDFS NameNodes
 * [x] HDFS DataNodes
-* [ ] HDFS JournalNodes
+* [x] HDFS JournalNodes
 * [ ] HDFS Namenode ZKFCs
 
 * [x] Hbase Masters

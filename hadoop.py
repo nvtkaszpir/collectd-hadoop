@@ -8,6 +8,7 @@ VERBOSE_LOGGING = False
 
 INSTANCE_TYPE_NAMENODE = 'namenode'
 INSTANCE_TYPE_DATANODE = 'datanode'
+INSTANCE_TYPE_HDFS_JOURNALNODE = 'hdfs_journalnode'
 INSTANCE_TYPE_HBASE_MASTER = 'hbase_master'
 INSTANCE_TYPE_HBASE_REGIONSERVER = 'hbase_regionserver'
 
@@ -25,7 +26,12 @@ BEAN_PREFIXES = {
         'DatanodeActivity': 'Hadoop:service=DataNode,name=DataNodeActivity',
         'OperatingSystem': 'java.lang:type=OperatingSystem',
         'Threading': 'java.lang:type=Threading',
-        'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
+        'JvmMetrics': 'Hadoop:service=DataNode,name=JvmMetrics',
+    },
+    INSTANCE_TYPE_HDFS_JOURNALNODE: {
+        'OperatingSystem': 'java.lang:type=OperatingSystem',
+        'Threading': 'java.lang:type=Threading',
+        'JvmMetrics': 'Hadoop:service=JournalNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_HBASE_MASTER: {
         'MasterBalancer': 'Hadoop:service=HBase,name=Master,sub=Balancer',
@@ -62,6 +68,9 @@ def configure_callback(conf):
         elif node.key == 'HDFSDatanodeHost':
             host = node.values[0]
             instance_type = INSTANCE_TYPE_DATANODE
+        elif node.key == 'HDFSJournalnodeHost':
+            host = node.values[0]
+            instance_type = INSTANCE_TYPE_HDFS_JOURNALNODE
         elif node.key == 'HbaseMasterHost':
             host = node.values[0]
             instance_type = INSTANCE_TYPE_HBASE_MASTER
