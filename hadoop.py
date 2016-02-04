@@ -63,8 +63,8 @@ def configure_callback(conf):
         else:
             collectd.warning('hadoop plugin: Unknown config key: %s.' % node.key)
 
-    if not host and not instance and not instance_type and not port:
-        collectd.error('hadoop plugin: Error Host, Port, Instance must be set.')
+    if not host or not instance or not instance_type or not port:
+        collectd.error('hadoop plugin error: *Host, Port, and Instance must be set.')
     else:
         config = {
             'host': host,
