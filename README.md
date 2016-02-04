@@ -10,7 +10,7 @@ It collects data from the http `/jmx` endpoints for:
 * [ ] HDFS Namenode ZKFCs
 
 * [x] Hbase Masters
-* [ ] Hbase Regionservers
+* [x] Hbase Regionservers
 
 These are currently all we use, so if you would like to monitor other pieces, pull requests
 are greatly appreciated.
