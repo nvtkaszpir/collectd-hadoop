@@ -7,7 +7,6 @@ It collects data from the http `/jmx` endpoints for:
 * [x] HDFS NameNodes
 * [x] HDFS DataNodes
 * [x] HDFS JournalNodes
-* [ ] HDFS Namenode ZKFCs
 
 * [x] Hbase Masters
 * [x] Hbase Regionservers
@@ -37,6 +36,7 @@ We have stubbed out a few things to aid in development of this plugin. Functiona
 inside `Docker` with the help of `docker-compose`
 
 ```bash
+$ docker-compose build tests
 $ docker-compose run tests
 ...
 collected 3 items

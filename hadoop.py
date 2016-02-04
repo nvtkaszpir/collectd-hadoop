@@ -18,27 +18,23 @@ CONFIGS = []
 BEAN_PREFIXES = {
     INSTANCE_TYPE_NAMENODE: {
         'FSNamesystem': 'Hadoop:service=NameNode,name=FSNamesystemState',
-        'OperatingSystem': 'java.lang:type=OperatingSystem',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_DATANODE: {
         'DatanodeActivity': 'Hadoop:service=DataNode,name=DataNodeActivity',
-        'OperatingSystem': 'java.lang:type=OperatingSystem',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=DataNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_HDFS_JOURNALNODE: {
-        'OperatingSystem': 'java.lang:type=OperatingSystem',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=JournalNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_HBASE_MASTER: {
         'MasterBalancer': 'Hadoop:service=HBase,name=Master,sub=Balancer',
         'MasterAssignmentManager': 'Hadoop:service=HBase,name=Master,sub=AssignmentManger',
-        'Threading': 'java.lang:type=Threading',
-        'OperatingSystem': 'java.lang:type=OperatingSystem',
         'MasterServer': 'Hadoop:service=HBase,name=Master,sub=Server',
+        'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
     },
     INSTANCE_TYPE_HBASE_REGIONSERVER: {
@@ -47,7 +43,6 @@ BEAN_PREFIXES = {
         'WAL': 'Hadoop:service=HBase,name=RegionServer,sub=WAL',
         'Server': 'Hadoop:service=HBase,name=RegionServer,sub=Server',
         'Threading': 'java.lang:type=Threading',
-        'OperatingSystem': 'java.lang:type=OperatingSystem',
         'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
     },
 }
