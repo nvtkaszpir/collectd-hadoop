@@ -18,21 +18,29 @@ CONFIGS = []
 BEAN_PREFIXES = {
     INSTANCE_TYPE_NAMENODE: {
         'FSNamesystem': 'Hadoop:service=NameNode,name=FSNamesystemState',
+        'GCPSScavenge': 'java.lang:type=GarbageCollector,name=PS Scavenge',
+        'GCPSMarkSweep': 'java.lang:type=GarbageCollector,name=PS MarkSweep',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=NameNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_DATANODE: {
         'DatanodeActivity': 'Hadoop:service=DataNode,name=DataNodeActivity',
+        'GCPSScavenge': 'java.lang:type=GarbageCollector,name=PS Scavenge',
+        'GCPSMarkSweep': 'java.lang:type=GarbageCollector,name=PS MarkSweep',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=DataNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_HDFS_JOURNALNODE: {
+        'GCPSScavenge': 'java.lang:type=GarbageCollector,name=PS Scavenge',
+        'GCPSMarkSweep': 'java.lang:type=GarbageCollector,name=PS MarkSweep',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=JournalNode,name=JvmMetrics',
     },
     INSTANCE_TYPE_HBASE_MASTER: {
         'MasterBalancer': 'Hadoop:service=HBase,name=Master,sub=Balancer',
         'MasterAssignmentManager': 'Hadoop:service=HBase,name=Master,sub=AssignmentManger',
+        'GCPSScavenge': 'java.lang:type=GarbageCollector,name=PS Scavenge',
+        'GCPSMarkSweep': 'java.lang:type=GarbageCollector,name=PS MarkSweep',
         'MasterServer': 'Hadoop:service=HBase,name=Master,sub=Server',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
@@ -42,6 +50,8 @@ BEAN_PREFIXES = {
         'Replication': 'Hadoop:service=HBase,name=RegionServer,sub=Replication',
         'WAL': 'Hadoop:service=HBase,name=RegionServer,sub=WAL',
         'Server': 'Hadoop:service=HBase,name=RegionServer,sub=Server',
+        'GCPSScavenge': 'java.lang:type=GarbageCollector,name=PS Scavenge',
+        'GCPSMarkSweep': 'java.lang:type=GarbageCollector,name=PS MarkSweep',
         'Threading': 'java.lang:type=Threading',
         'JvmMetrics': 'Hadoop:service=HBase,name=JvmMetrics',
     },
