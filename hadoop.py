@@ -123,7 +123,6 @@ def get_jmx_beans(host, port):
 def process_metrics(host, port, instance, instance_type, verbose_logging):
     beans = get_jmx_beans(host, port)
 
-    print host, instance, instance_type
     for bean in beans:
         for name, prefix in BEAN_PREFIXES[instance_type].iteritems():
             if bean['name'].startswith(prefix):
