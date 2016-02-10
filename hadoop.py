@@ -127,7 +127,7 @@ def process_metrics(host, port, instance, instance_type, verbose_logging):
         for name, prefix in BEAN_PREFIXES[instance_type].iteritems():
             if bean['name'].startswith(prefix):
                 for metric, value in bean.iteritems():
-                    if isinstance(value, int):
+                    if isinstance(value, int) or isinstance(value, float):
                         dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
 
 
