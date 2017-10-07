@@ -1,2 +1,6 @@
 *.pyc
 .cache
+# for markdown previews
+README.html
+# virtualenv
+.venv/

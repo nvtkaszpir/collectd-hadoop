@@ -1,10 +1,13 @@
-#! /usr/bin/python
+#!/usr/bin/python
 
 import collectd
 import json
 import urllib2
 
 VERBOSE_LOGGING = False
+# replace any underscore in metric name to dot, for backward compatibility it is set to false
+# to enable it use in collectd config 'ReplaceUnderscore true'
+REPLACE_UNDERSCORE = False
 
 INSTANCE_TYPE_NAMENODE = 'namenode'
 INSTANCE_TYPE_DATANODE = 'datanode'
@@ -65,6 +68,7 @@ def configure_callback(conf):
     instance = None
     instance_type = None
     verbose_logging = VERBOSE_LOGGING
+    replace_underscore = REPLACE_UNDERSCORE
 
     for node in conf.children:
         if node.key == 'HDFSNamenodeHost':
@@ -86,6 +90,8 @@ def configure_callback(conf):
             port = node.values[0]
         elif node.key == 'Instance':
             instance = node.values[0]
+        elif node.key == 'ReplaceUnderscore':
+            replace_underscore = bool(node.values[0])
         elif node.key == 'Verbose':
             verbose_logging = bool(node.values[0])
         else:
@@ -99,7 +105,8 @@ def configure_callback(conf):
             'port': port,
             'instance': instance,
             'instance_type': instance_type,
-            'verbose_logging': verbose_logging
+            'verbose_logging': verbose_logging,
+            'replace_underscore': replace_underscore
         }
 
         CONFIGS.append(config)
@@ -120,13 +127,33 @@ def get_jmx_beans(host, port):
     return {}
 
 
-def process_metrics(host, port, instance, instance_type, verbose_logging):
+def process_metrics(host, port, instance, instance_type, verbose_logging, replace_underscore=False):
     beans = get_jmx_beans(host, port)
 
     for bean in beans:
         for name, prefix in BEAN_PREFIXES[instance_type].iteritems():
             if bean['name'].startswith(prefix):
                 for metric, value in bean.iteritems():
+
+                    if replace_underscore:
+                        metric = metric.replace('_', '.')
+
+                    # special cases, unfortunately some metrics are booleans values as strings
+                    # HBase is active master
+                    # Hadoop out of sync
+                    if metric in ['tag.isActiveMaster', 'tag.IsOutOfSync']:
+                        if value == 'true':
+                            value = True
+                        else:
+                            value = False
+                    # Hadoop namenode state active/standby
+                    if metric in ['State', 'tag.HAState']:
+                        if value == 'active':
+                            value = True
+                        else:
+                            value = False
+
+                    # notice that this actally catches also bool as int
                     if isinstance(value, int) or isinstance(value, float):
                         dispatch_stat('gauge', '.'.join((name, metric)), value, instance, instance_type, verbose_logging)
 
@@ -136,20 +163,20 @@ def read_callback():
 
     for config in CONFIGS:
         log_verbose('Read callback called for instance: %s' % config['instance'], config['verbose_logging'])
-        process_metrics(config['host'], config['port'], config['instance'], config['instance_type'], config['verbose_logging'])
+        process_metrics(config['host'], config['port'], config['instance'], config['instance_type'], config['verbose_logging'], config['replace_underscore'])
 
 
-def dispatch_stat(type, name, value, instance, instance_type, verbose_logging):
+def dispatch_stat(stat_type, name, value, instance, instance_type, verbose_logging):
     """Read a key from info response data and dispatch a value"""
 
     if value is None:
         collectd.warning('hadoop plugin: Value not found for %s' % name)
     else:
         plugin_instance = '.'.join((instance, instance_type))
-        log_verbose('Sending value from %s [%s]: %s=%s' % (plugin_instance, type, name, value), verbose_logging)
+        log_verbose('Sending value from %s [%s]: %s=%s' % (plugin_instance, stat_type, name, value), verbose_logging)
 
         val = collectd.Values(plugin='hadoop')
-        val.type = type
+        val.type = stat_type
         val.type_instance = name
         val.values = [value]
         val.plugin_instance = plugin_instance

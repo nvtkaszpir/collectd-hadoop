@@ -17,7 +17,7 @@ def test_default_error(mocker):
     collectd.error.assert_called_once_with('hadoop plugin error: *Host, Port, and Instance must be set.')
 
 
-def assert_config(module_string, host, port, instance, instance_type):
+def assert_config(module_string, host, port, instance, instance_type, replace_underscore=False):
     conf = MockConfig(module_string)
 
     configure_callback(conf)
@@ -37,6 +37,9 @@ def assert_config(module_string, host, port, instance, instance_type):
 
     assert 'instance_type' in config
     assert config['instance_type'] == instance_type
+
+    assert 'replace_underscore' in config
+    assert isinstance(config['replace_underscore'], bool)
 
 
 def test_set_namenode():
@@ -104,6 +107,49 @@ def test_set_hbase_regionserver():
 HbaseRegionserverHost "example.com"
 Port "9999"
 Instance "myinstance"
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_regionserver')
+
+
+def test_set_replace_underscore_false():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HbaseRegionserverHost "example.com"
+Port "9999"
+Instance "myinstance"
+ReplaceUnderscore false
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_regionserver')
+
+def test_set_replace_underscore_true():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HbaseRegionserverHost "example.com"
+Port "9999"
+Instance "myinstance"
+ReplaceUnderscore true
+'''
+
+    assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_regionserver')
+
+def test_set_replace_underscore_weird():
+    global CONFIGS
+    # clear because it is global...
+    del CONFIGS[:]
+
+    module_string = '''
+HbaseRegionserverHost "example.com"
+Port "9999"
+Instance "myinstance"
+ReplaceUnderscore steve
 '''
 
     assert_config(module_string, 'example.com', '9999', 'myinstance', 'hbase_regionserver')

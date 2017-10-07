@@ -22,7 +22,22 @@ are greatly appreciated.
 
 Configuration
 -------------
- * See `hadoop.conf`
+ * See `hadoop.conf` for more detailed examples
+ * Some special fields are converted from string 'true' or 'active' to boolean
+ * Remember that boolean derives from integer in python.
+
+* ReplaceUnderscore parameter
+ If you use `write_graphite` then you may be interested in using `PreserveSeparator false` and this plugin with setting `ReplaceUnderscore true`.
+ This way you will get nested structure for some keys with underscores - it is especially useful for HBase Regionserver.
+ For example:
+ `gauge-Regions_Namespace_default_table_tsdb_region_674eb5d0ee8c78ca0c81fd35fa3183b3_metric_scanNext_min`
+ will be changed to
+ `gauge-Regions.Namespace.default.table.tsdb.region.674eb5d0ee8c78ca0c81fd35fa3183b3.metric.scanNext.min`
+ and with `write_graphite` using `PreserveSeparator false` it will be nested structure, instead of one long plain entry.
+ Notice that if enabled then ALL metrics which contain underscores will be converted, so it will require to change graphs/searches, though.
+ Example:
+  ![Nested structure tree in Graphite when using ReplaceUnderscore true and PreserveSeparator false](graphite.png "Nested strucutre when using ReplaceUnderscore true and PreserveSeparator false")
+
 
 Requirements
 ------------
