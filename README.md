@@ -16,27 +16,34 @@ are greatly appreciated.
 
 ## Install
 
-1. Place `hadoop.py` in /opt/collectd/lib/collectd/plugins/python (assuming you have collectd installed to /opt/collectd).
+1. Place `hadoop.py` in `/opt/collectd/lib/collectd/plugins/python` (assuming you have collectd installed to `/opt/collectd`).
 2. Configure the plugin (see below).
 3. Restart collectd.
 
 Configuration
 -------------
- * See `hadoop.conf` for more detailed examples
- * Some special fields are converted from string 'true' or 'active' to boolean
- * Remember that boolean derives from integer in python.
+ * See `hadoop.conf` for more detailed examples. Remember to also read about collect-python plugin.
+ * Note: Some special fields are converted from string 'true' or 'active' to boolean
+ * Note: Remember that boolean derives from integer in python.
 
-* ReplaceUnderscore parameter
- If you use `write_graphite` then you may be interested in using `PreserveSeparator false` and this plugin with setting `ReplaceUnderscore true`.
- This way you will get nested structure for some keys with underscores - it is especially useful for HBase Regionserver.
- For example:
- `gauge-Regions_Namespace_default_table_tsdb_region_674eb5d0ee8c78ca0c81fd35fa3183b3_metric_scanNext_min`
+ * ReplaceUnderscore parameter is by default set to false, so read below what it does.
+
+If you use `write_graphite` then you may be interested in using `PreserveSeparator false` and this plugin with setting `ReplaceUnderscore true`.
+This way you will get nested structure for some keys with underscores - it is especially useful for HBase Regionserver.
+For example:
+
+`gauge-Regions_Namespace_default_table_tsdb_region_674eb5d0ee8c78ca0c81fd35fa3183b3_metric_scanNext_min`
+
  will be changed to
+
  `gauge-Regions.Namespace.default.table.tsdb.region.674eb5d0ee8c78ca0c81fd35fa3183b3.metric.scanNext.min`
- and with `write_graphite` using `PreserveSeparator false` it will be nested structure, instead of one long plain entry.
- Notice that if enabled then ALL metrics which contain underscores will be converted, so it will require to change graphs/searches, though.
- Example:
-  ![Nested structure tree in Graphite when using ReplaceUnderscore true and PreserveSeparator false](graphite.png "Nested strucutre when using ReplaceUnderscore true and PreserveSeparator false")
+
+and with `write_graphite` using `PreserveSeparator false` it will be nested structure, instead of one long plain entry.
+Notice that if enabled then ALL metrics which contain underscores will be converted, so it will require to change graphs/searches, though.
+
+Example of those both settings in action within Graphite web UI:
+
+![Nested structure tree in Graphite when using ReplaceUnderscore true and PreserveSeparator false](graphite.png "Nested strucutre when using ReplaceUnderscore true and PreserveSeparator false")
 
 
 Requirements
